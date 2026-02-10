@@ -8,6 +8,12 @@ public class Client {
     private String phone;
 
     public Client(String name, String phone) {
+    	if (name == null || name.isBlank()) {
+            throw new IllegalArgumentException("Client name cannot be empty");
+        }
+    	if (phone == null || phone.isBlank()) {
+            throw new IllegalArgumentException("Client phone cannot be empty");
+        }
         this.id = autoIncrement++;
         this.name = name;
         this.phone = phone;

@@ -1,87 +1,94 @@
 package model;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
+import enums.ConstructionStatus;
 
 public class Construction {
-	
-	private Integer id;
-	private BigDecimal value;
-	private LocalDate deadline;
-	private Employee employee;
-	private Client client;
-	private String location;
-	
-	public Construction(Integer id, BigDecimal value, LocalDate deadline, Employee employee, Client client, String location) {
-		this.id = id;
-		this.value = value;
-		this.deadline = deadline;
-		this.employee = employee;
-		this.client = client;
-		this.location = location;
-	}
 
-	public BigDecimal getValue() {
-		return value;
-	}
+    private static int autoIncrement = 1;
 
-	public void setValue(BigDecimal value) {
-		this.value = value;
-	}
+    private final Integer id;
+    private String description;
+    private Double budget;
+    private LocalDate startDate;
+    private LocalDate deadline;
+    private ConstructionStatus status;
 
-	public LocalDate getDeadline() {
-		return deadline;
-	}
+    private Client client;
+    private Location location;
+    private List<Employee> employees = new ArrayList<>();
+    private List<Expense> expenses = new ArrayList<>();
 
-	public void setDeadline(LocalDate deadline) {
-		this.deadline = deadline;
-	}
+    public Construction(String description, Double budget, LocalDate startDate, 
+                        LocalDate deadline, Client client, Location location) {
 
-	public Employee getEmployee() {
-		return employee;
-	}
+        this.id = autoIncrement++;
+        this.description = description;
+        this.budget = budget;
+        this.startDate = startDate;
+        this.deadline = deadline;
+        this.client = client;
+        this.location = location;
+        this.status = ConstructionStatus.PLANNING;
+    }
 
-	public void setEmployee(Employee employee) {
-		this.employee = employee;
-	}
+    public void addExpense(Expense expense) {
+        if (expense == null) {
+            throw new IllegalArgumentException("Expense cannot be null");
+        }
+        this.expenses.add(expense);
+    }
 
-	public Client getClient() {
-		return client;
-	}
+    public double getTotalExpenses() {
+        return expenses.stream()
+                .mapToDouble(Expense::getAmount)
+                .sum();
+    }
 
-	public void setClient(Client client) {
-		this.client = client;
-	}
+    public double getProfit() {
+        return budget - getTotalExpenses();
+    }
+    
+    public void addEmployee(Employee employee) {
+        if (employee == null) {
+            throw new IllegalArgumentException("Employee cannot be null");
+        }
+        this.employees.add(employee);
+    }
 
-	public String getLocation() {
-		return location;
-	}
+    public void removeEmployee(Employee employee) {
+        this.employees.remove(employee);
+    }
 
-	public void setLocation(String location) {
-		this.location = location;
-	}
-	
-	@Override
-	public boolean equals(Object o) {
-	    if (this == o) return true;
-	    if (!(o instanceof Construction)) return false;
-	    Construction construction = (Construction) o;
-	    return id != null && id.equals(construction.id);
-	}
+    public void updateStatus(ConstructionStatus status) {
+        this.status = status;
+    }
 
-	@Override
-	public int hashCode() {
-	    return getClass().hashCode();
-	}
+    public long getRemainingDays() {
+        return java.time.temporal.ChronoUnit.DAYS.between(LocalDate.now(), deadline);
+    }
 
-	
-	@Override
-	public String toString() {
-	    return String.format(
-	        "Construction [id=%d, value=%s, deadline=%s, client=%s, location=%s, employee=%s]",
-	        id, value, deadline, client, location, employee
-	    );
-	}
+    public boolean isDelayed() {
+        return LocalDate.now().isAfter(deadline) 
+                && status != ConstructionStatus.COMPLETED;
+    }    
 
-	
+    @Override
+    public String toString() {
+        return "Construction [id=" + id +
+               ", description=" + description +
+               ", budget=" + budget +
+               ", startDate=" + startDate +
+               ", deadline=" + deadline +
+               ", status=" + status +
+               ", client=" + client +
+               ", location=" + location +
+               ", employees=" + employees.size() +
+               ", expenses=" + expenses.size() +
+               "]";
+    }
+
 }

@@ -8,6 +8,12 @@ public class Location {
     private String city;
 
     public Location(String address, String city) {
+    	if (address == null || address.isBlank()) {
+            throw new IllegalArgumentException("Address cannot be empty");
+        }
+        if (city == null || city.isBlank()) {
+            throw new IllegalArgumentException("City cannot be empty");
+        }
         this.id = autoIncrement++;
         this.address = address;
         this.city = city;
