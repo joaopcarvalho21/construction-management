@@ -11,6 +11,10 @@ public class Employee {
     private BigDecimal salary;
 
     public Employee(String name, String role, BigDecimal salary) {
+        if (name == null || role == null || salary == null || salary.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("Invalid employee data");
+        }
+
         this.id = autoIncrement++;
         this.name = name;
         this.role = role;

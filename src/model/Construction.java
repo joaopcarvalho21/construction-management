@@ -35,11 +35,18 @@ public class Construction {
         this.status = ConstructionStatus.PLANNING;
     }
 
-    public void addExpense(Expense expense) {
-        if (expense == null) {
+    public void addExpense(Expense ex) {
+        if (ex == null) {
             throw new IllegalArgumentException("Expense cannot be null");
         }
-        this.expenses.add(expense);
+        this.expenses.add(ex);
+    }
+    
+    public void removeExpense(Expense ex) {
+        if (ex == null) {
+            throw new IllegalArgumentException("Expense cannot be null");
+        }
+        this.expenses.remove(ex);
     }
 
     public double getTotalExpenses() {
@@ -52,15 +59,15 @@ public class Construction {
         return budget - getTotalExpenses();
     }
     
-    public void addEmployee(Employee employee) {
-        if (employee == null) {
+    public void addEmployee(Employee e) {
+        if (e == null) {
             throw new IllegalArgumentException("Employee cannot be null");
         }
-        this.employees.add(employee);
+        this.employees.add(e);
     }
 
-    public void removeEmployee(Employee employee) {
-        this.employees.remove(employee);
+    public void removeEmployee(Employee e) {
+        this.employees.remove(e);
     }
 
     public void updateStatus(ConstructionStatus status) {
