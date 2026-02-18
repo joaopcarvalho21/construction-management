@@ -1,25 +1,41 @@
 package service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import enums.ConstructionStatus;
 import model.Construction;
 import model.Employee;
 import model.Expense;
 
 public class ConstructionService {
+	
+	private final List<Construction> constructions = new ArrayList<>();
 
-    public void addEmployee(Construction c, Employee e) {
-        if (c == null || e == null) {
-            throw new IllegalArgumentException("Construction and Employee cannot be null");
+    public void addConstruction(Construction c) {
+        if (c == null) {
+            throw new IllegalArgumentException("Construction cannot be null");
         }
-        c.addEmployee(e);
+        constructions.add(c);
+    }
+	
+	public List<Construction> getConstructions() {
+        return constructions;
     }
 
-    public void removeEmployee(Construction c, Employee e) {
-        if (c == null || e == null) {
-            throw new IllegalArgumentException("Construction and Employee cannot be null");
-        }
-        c.removeEmployee(e);
-    }
+	public void addEmployee(Construction c, Employee e) {
+	    if (c == null || e == null) {
+	        throw new IllegalArgumentException("Construction and Employee cannot be null");
+	    }
+	    c.addEmployee(e);
+	}
+
+	public void removeEmployee(Construction c, Employee e) {
+	    if (c == null || e == null) {
+	        throw new IllegalArgumentException("Construction and Employee cannot be null");
+	    }
+	    c.removeEmployee(e);
+	}
 
     public void addExpense(Construction c, Expense ex) {
         if (c == null || ex == null) {
