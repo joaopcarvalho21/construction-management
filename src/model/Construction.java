@@ -1,16 +1,16 @@
 package model;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import enums.ConstructionStatus;
 
 public class Construction {
 
-    private static int autoIncrement = 1;
-
-    private final Integer id;
+    private final String id;
     private String name;
     private Double budget;
     private LocalDate startDate;
@@ -22,10 +22,10 @@ public class Construction {
     private List<Employee> employees = new ArrayList<>();
     private List<Expense> expenses = new ArrayList<>();
 
-    public Construction(String name, Double budget, LocalDate startDate, 
+    public Construction(String name, Double budget, LocalDate startDate,
                         LocalDate deadline, Client client, Location location) {
 
-        this.id = autoIncrement++;
+        this.id = UUID.randomUUID().toString();
         this.name = name;
         this.budget = budget;
         this.startDate = startDate;
@@ -35,7 +35,7 @@ public class Construction {
         this.status = ConstructionStatus.PLANNING;
     }
 
-    public Integer getId() {
+    public String getId() {
         return id;
     }
 
@@ -88,7 +88,7 @@ public class Construction {
     }
 
     public void setDeadline(LocalDate deadline) {
-        if (deadline != null && deadline.isAfter(startDate)) {
+        if (deadline != null && startDate != null && deadline.isAfter(startDate)) {
             this.deadline = deadline;
         }
     }
@@ -97,14 +97,14 @@ public class Construction {
         if (ex == null) {
             throw new IllegalArgumentException("Expense cannot be null");
         }
-        this.expenses.add(ex);
+        expenses.add(ex);
     }
 
     public void removeExpense(Expense ex) {
         if (ex == null) {
             throw new IllegalArgumentException("Expense cannot be null");
         }
-        this.expenses.remove(ex);
+        expenses.remove(ex);
     }
 
     public double getTotalExpenses() {
@@ -121,14 +121,14 @@ public class Construction {
         if (e == null) {
             throw new IllegalArgumentException("Employee cannot be null");
         }
-        this.employees.add(e);
+        employees.add(e);
     }
 
     public void removeEmployee(Employee e) {
         if (e == null) {
             throw new IllegalArgumentException("Employee cannot be null");
         }
-        this.employees.remove(e);
+        employees.remove(e);
     }
 
     public void updateStatus(ConstructionStatus status) {
@@ -138,18 +138,18 @@ public class Construction {
     }
 
     public long getRemainingDays() {
-        return java.time.temporal.ChronoUnit.DAYS.between(LocalDate.now(), deadline);
+        return ChronoUnit.DAYS.between(LocalDate.now(), deadline);
     }
 
     public boolean isDelayed() {
-        return LocalDate.now().isAfter(deadline) 
+        return LocalDate.now().isAfter(deadline)
                 && status != ConstructionStatus.COMPLETED;
     }
 
     @Override
     public String toString() {
         return String.format(
-                "Construction [id=%d, name=%s, budget=R$ %.2f, status=%s, client=%s, city=%s, employees=%d, expenses=%d]",
+                "Construction [id=%s, name=%s, budget=R$ %.2f, status=%s, client=%s, city=%s, employees=%d, expenses=%d]",
                 id, name, budget, status,
                 client.getName(), location.getCity(),
                 employees.size(), expenses.size()

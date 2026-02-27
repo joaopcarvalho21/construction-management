@@ -1,78 +1,75 @@
-package service;
+package dao;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import enums.ConstructionStatus;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+
 import model.Construction;
-import model.Employee;
-import model.Expense;
 
-public class ConstructionService {
-	
-	private final List<Construction> constructions = new ArrayList<>();
+public class ConstructionDAO {
 
-    public void addConstruction(Construction c) {
-        if (c == null) {
-            throw new IllegalArgumentException("Construction cannot be null");
-        }
-        constructions.add(c);
-    }
-	
-	public List<Construction> getConstructions() {
-        return constructions;
+    private static final String FILE_PATH = "database/constructions.json";
+
+    private final ObjectMapper mapper;
+
+    public ConstructionDAO() {
+        this.mapper = new ObjectMapper();
+        this.mapper.enable(SerializationFeature.INDENT_OUTPUT);
+        ensureFileExists();
     }
 
-	public void addEmployee(Construction c, Employee e) {
-	    if (c == null || e == null) {
-	        throw new IllegalArgumentException("Construction and Employee cannot be null");
-	    }
-	    c.addEmployee(e);
-	}
-
-	public void removeEmployee(Construction c, Employee e) {
-	    if (c == null || e == null) {
-	        throw new IllegalArgumentException("Construction and Employee cannot be null");
-	    }
-	    c.removeEmployee(e);
-	}
-
-    public void addExpense(Construction c, Expense ex) {
-        if (c == null || ex == null) {
-            throw new IllegalArgumentException("Construction and Expense cannot be null");
+    private void ensureFileExists() {
+        try {
+            File file = new File(FILE_PATH);
+            if (!file.exists()) {
+                file.getParentFile().mkdirs();
+                mapper.writeValue(file, new ArrayList<Construction>());
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to create data file", e);
         }
-        if (ex.getAmount() <= 0) {
-            throw new IllegalArgumentException("Expense amount must be positive");
-        }
-        c.addExpense(ex);
     }
 
-    public void removeExpense(Construction c, Expense ex) {
-        if (c == null || ex == null) {
-            throw new IllegalArgumentException("Construction and Expense cannot be null");
+    public List<Construction> findAll() {
+        try {
+            return mapper.readValue(
+                    new File(FILE_PATH),
+                    new TypeReference<List<Construction>>() {}
+            );
+        } catch (IOException e) {
+            return new ArrayList<>();
         }
-        c.removeExpense(ex);
     }
 
-    public double calculateProfit(Construction c) {
-        if (c == null) {
-            throw new IllegalArgumentException("Construction cannot be null");
-        }
-        return c.getProfit();
+    public void save(Construction construction) {
+        List<Construction> list = findAll();
+        list.add(construction);
+        write(list);
     }
 
-    public double calculateTotalExpenses(Construction c) {
-        if (c == null) {
-            throw new IllegalArgumentException("Construction cannot be null");
+    public void update(Construction updated) {
+        List<Construction> list = findAll();
+
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i).getId().equals(updated.getId())) {
+                list.set(i, updated);
+                break;
+            }
         }
-        return c.getTotalExpenses();
+
+        write(list);
     }
 
-    public void updateStatus(Construction c, ConstructionStatus status) {
-        if (c == null || status == null) {
-            throw new IllegalArgumentException("Construction and status cannot be null");
+    private void write(List<Construction> list) {
+        try {
+            mapper.writeValue(new File(FILE_PATH), list);
+        } catch (IOException e) {
+            throw new RuntimeException("Error saving data", e);
         }
-        c.updateStatus(status);
     }
-
 }
